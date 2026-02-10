@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang='es'>
+<head>
+    <meta charset='UTF-8'>
+    <link rel='stylesheet' href='estilos.css'>
+    <title>Reloj Inteligente - Calidad</title>
+</head>
+<body>
+<div class='card'>
+    <h2>Calculadora Reloj</h2>
+    <div id='reloj-visual'>
+        <div class='centro'></div>
+        <div id='hora-hand' class='manecilla'></div>
+        <div id='min-hand' class='manecilla'></div>
+        <div id='seg-hand' class='manecilla'></div>
+    </div>
+    
+    <div class='input-group'>
+        <label>Comparar:</label>
+        <select id='opcion' onchange='validarYCalcular()'>
+            <option value='hm'>Horario – Minutero</option>
+            <option value='ms'>Minutero – Segundero</option>
+            <option value='hs'>Horario – Segundero</option>
+        </select>
+    </div>
+
+    <div class='input-group'>
+        <label>Hora (0-23):</label>
+        <input type='number' id='h' value='0' oninput='validarYCalcular()'>
+    </div>
+    <div class='input-group'>
+        <label>Minutos:</label>
+        <input type='number' id='m' value='0' oninput='validarYCalcular()'>
+    </div>
+    <div class='input-group'>
+        <label>Segundos (Opcional):</label>
+        <input type='number' id='s' placeholder='0' oninput='validarYCalcular()'>
+    </div>
+
+    <div id='res'></div>
+</div>
+<script src='funciones.js'></script>
+</body>
+</html>
