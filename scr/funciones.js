@@ -2,11 +2,12 @@
     var hInput = document.getElementById('h').value;
     var mInput = document.getElementById('m').value;
     var sInput = document.getElementById('s').value;
-    
+    var op = document.getElementById('opcion').value;
+    var box = document.getElementById('res');
+
     var h = parseInt(hInput) || 0;
     var m = parseInt(mInput) || 0;
     var s = parseInt(sInput) || 0;
-    var box = document.getElementById('res');
 
     if (h < 0 || h > 23 || m < 0 || m > 59 || s < 0 || s > 59) {
         box.className = 'error'; 
@@ -14,36 +15,44 @@
         return;
     }
 
-    // Grados de las manecillas
-    var h12 = h % 12;
-    var posH = h12 * 30;
+    // 1. Conversión de 24h a 12h y cálculo de grados
+    var hAnaloga = h % 12;
+    var posH = hAnaloga * 30;
     var posM = m * 6;
     var posS = s * 6;
 
-    // Movimiento visual del reloj
+    // 2. Movimiento visual del reloj
     document.getElementById('hora-hand').style.transform = 'translateX(-50%) rotate(' + posH + 'deg)';
     document.getElementById('min-hand').style.transform = 'translateX(-50%) rotate(' + posM + 'deg)';
     document.getElementById('seg-hand').style.transform = 'translateX(-50%) rotate(' + posS + 'deg)';
 
-    // Cálculo de los dos ángulos
-    var angHM = Math.abs(posH - posM);
-    if (angHM > 180) angHM = 360 - angHM;
+    // 3. Cálculo de Ángulo Principal (Basado en el Menú)
+    var anguloPrincipal = 0;
+    var etiquetaPrincipal = "";
+    if (op === 'hm') { anguloPrincipal = Math.abs(posH - posM); etiquetaPrincipal = "Horario - Minutero"; }
+    else if (op === 'ms') { anguloPrincipal = Math.abs(posM - posS); etiquetaPrincipal = "Minutero - Segundero"; }
+    else { anguloPrincipal = Math.abs(posH - posS); etiquetaPrincipal = "Horario - Segundero"; }
+    
+    if (anguloPrincipal > 180) anguloPrincipal = 360 - anguloPrincipal;
 
-    var angMS = Math.abs(posM - posS);
-    if (angMS > 180) angMS = 360 - angMS;
-
+    // 4. Construcción del Resultado
     box.className = 'success';
     var periodo = h >= 12 ? 'PM' : 'AM';
-    var hDisp = h12 === 0 ? 12 : h12;
+    var h12 = hAnaloga === 0 ? 12 : hAnaloga;
 
-    // DISEÑO: El de la hora siempre está arriba, el del segundo aparece abajo
-    var html = '<div style="font-size: 0.8em; color: #666;">' + hDisp + ':' + m.toString().padStart(2, '0') + ' ' + periodo + '</div>';
-    html += '<div style="margin: 5px 0;"><b>Ángulo H-M: ' + angHM + '°</b></div>';
+    var html = '<div style="font-size: 0.8em; color: #666; margin-bottom: 5px;">' + h12 + ':' + m.toString().padStart(2, '0') + ' ' + periodo + '</div>';
+    html += '<div style="border-bottom: 1px solid #ddd; padding-bottom: 5px;">' +
+            '<small>Resultado Principal:</small><br>' +
+            '<b>' + etiquetaPrincipal + ': ' + anguloPrincipal + '°</b></div>';
 
-    // Condición: Solo si hay algo escrito en la casilla de segundos, mostramos el segundo ángulo
+    // 5. RESPUESTA SECUNDARIA (Solo si hay segundos ingresados)
     if (sInput !== "" && sInput !== null) {
-        html += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #bbb; color: #1a73e8;">' +
-                '<b>Ángulo M-S: ' + angMS + '°</b></div>';
+        var anguloSeg = Math.abs(posM - posS);
+        if (anguloSeg > 180) anguloSeg = 360 - anguloSeg;
+
+        html += '<div style="margin-top: 8px; color: #1a73e8;">' +
+                '<small>Cálculo de Segundos (Extra):</small><br>' +
+                '<b>Minutero - Segundero: ' + anguloSeg + '°</b></div>';
     }
 
     box.innerHTML = html;
