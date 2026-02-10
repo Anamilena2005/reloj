@@ -14,38 +14,37 @@
         return;
     }
 
-    // Posiciones en grados
+    // Grados de las manecillas
     var h12 = h % 12;
     var posH = h12 * 30;
     var posM = m * 6;
     var posS = s * 6;
 
-    // Mover manecillas del reloj
+    // Movimiento visual del reloj
     document.getElementById('hora-hand').style.transform = 'translateX(-50%) rotate(' + posH + 'deg)';
     document.getElementById('min-hand').style.transform = 'translateX(-50%) rotate(' + posM + 'deg)';
     document.getElementById('seg-hand').style.transform = 'translateX(-50%) rotate(' + posS + 'deg)';
 
+    // Cálculo de los dos ángulos
+    var angHM = Math.abs(posH - posM);
+    if (angHM > 180) angHM = 360 - angHM;
+
+    var angMS = Math.abs(posM - posS);
+    if (angMS > 180) angMS = 360 - angMS;
+
     box.className = 'success';
     var periodo = h >= 12 ? 'PM' : 'AM';
-    var hDisplay = h12 === 0 ? 12 : h12;
-    var titulo = "";
-    var anguloFinal = 0;
+    var hDisp = h12 === 0 ? 12 : h12;
 
-    // LÓGICA DE DETECCIÓN AUTOMÁTICA
+    // DISEÑO: El de la hora siempre está arriba, el del segundo aparece abajo
+    var html = '<div style="font-size: 0.8em; color: #666;">' + hDisp + ':' + m.toString().padStart(2, '0') + ' ' + periodo + '</div>';
+    html += '<div style="margin: 5px 0;"><b>Ángulo H-M: ' + angHM + '°</b></div>';
+
+    // Condición: Solo si hay algo escrito en la casilla de segundos, mostramos el segundo ángulo
     if (sInput !== "" && sInput !== null) {
-        // SI EL USUARIO INGRESÓ SEGUNDOS: Prioridad al ángulo Minuto-Segundo
-        anguloFinal = Math.abs(posM - posS);
-        titulo = "Ángulo Minutero - Segundero";
-    } else {
-        // SI LA CASILLA DE SEGUNDOS ESTÁ VACÍA: Ángulo Horario-Minuto
-        anguloFinal = Math.abs(posH - posM);
-        titulo = "Ángulo Horario - Minutero";
+        html += '<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #bbb; color: #1a73e8;">' +
+                '<b>Ángulo M-S: ' + angMS + '°</b></div>';
     }
 
-    // Ajuste para el ángulo menor (estándar de calidad)
-    if (anguloFinal > 180) { anguloFinal = 360 - anguloFinal; }
-
-    box.innerHTML = '<div style="font-size: 0.8em; color: #666;">' + hDisplay + ':' + m.toString().padStart(2, '0') + (sInput !== "" ? ':' + s.toString().padStart(2, '0') : "") + ' ' + periodo + '</div>' +
-                    '<div style="margin-top: 5px;"><b>' + titulo + ':</b></div>' +
-                    '<div style="font-size: 1.8em; color: #1a73e8;">' + anguloFinal + '°</div>';
+    box.innerHTML = html;
 }
